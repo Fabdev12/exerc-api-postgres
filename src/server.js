@@ -1,4 +1,4 @@
-//postgresql://postgres:901206@localhost:5432/eventos_exer
+
 require("dotenv").config();
 const express = require("express")
 const router = require("./router")
