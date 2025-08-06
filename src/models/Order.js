@@ -33,7 +33,16 @@ class Order {
         customers.updated_at AS "customer.updated_at"
       FROM orders JOIN customers ON customers.id = orders.customer_id;`
     );
-    return result.rows.map(row => new Order(row));
+    return result.rows.map((row) => {
+      const customer = new Customer({
+        id: row["customer.id"],
+        name: row["customer.name"],
+        email: row["customer.email"],
+        created_at: row["customer.created_at"],
+        updated_at: row["customer.updated_at"],
+      })
+      return new Order(row, customer)
+    });
   }
 
 	// no método create() veremos como usar uma transaction
@@ -97,6 +106,7 @@ class Order {
 	// no método findById() incluiremos os dados do cliente e a lista dos produtos
   static async findById(id) {
     const orderResult = await query(
+      //pega o pedido e o cliente 
       `SELECT
         orders.*,
         customers.id AS "customer.id",
@@ -108,6 +118,7 @@ class Order {
       WHERE orders.id = $1;`,
       [id]
     )
+    //Pega os produtos do pedido acima
     const orderProductsResult = await query(
       `SELECT order_products.*, products.*
       FROM order_products JOIN products ON order_products.product_id = products.id
